@@ -54,10 +54,10 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.args.run }}
+    - ${{ inputs.run }}
   env:
-    SWAGGER_SPEC_PATH: ${{ inputs.args.swaggerSpecPath }}
-    SWAGGER_SPEC_IGNORE_PKGS: ${{ inputs.args.swaggerSpecIgnorePkgs }}
-    SWAGGER_SDK_DESTINATION: ${{ inputs.args.swaggerSdkDestination }}
-    DOCKER_USER: ${{ inputs.args.dockerUser }}
-    DOCKER_TOKEN: ${{ inputs.args.dockerToken }}
+    SWAGGER_SPEC_PATH: ${{ inputs.swaggerSpecPath }}
+    SWAGGER_SPEC_IGNORE_PKGS: ${{ inputs.swaggerSpecIgnorePkgs }}
+    SWAGGER_SDK_DESTINATION: ${{ inputs.swaggerSdkDestination }}
+    DOCKER_USER: ${{ inputs.dockerUser }}
+    DOCKER_TOKEN: ${{ inputs.dockerToken }}
