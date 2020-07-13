@@ -22,19 +22,6 @@ RUN sed -ri "s/(httpredir|deb).debian.org/${APT_MIRROR:-deb.debian.org}/g" /etc/
  && sed -ri "s/(security).debian.org/${APT_MIRROR:-security.debian.org}/g" /etc/apt/sources.list
 ENV OSX_CROSS_PATH=/osxcross
 
-# NodeJS
-
-RUN mkdir -p /usr/local/nvm
-ENV NVM_DIR /usr/local/nvm
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash \
-    && . $NVM_DIR/nvm.sh \
-    && nvm install ${NODE_VERSION} \
-    && nvm alias default ${NODE_VERSION} \
-    && nvm use default
-
-ENV NODE_PATH $NVM_DIR/v${NODE_VERSION}/lib/node_modules
-ENV PATH      $NVM_DIR/v${NODE_VERSION}/bin:$PATH
-
 FROM base AS osx-sdk
 ARG OSX_SDK
 ARG OSX_SDK_SUM
@@ -96,12 +83,23 @@ RUN add-apt-repository \
        $(lsb_release -cs) \
        stable"
 RUN apt-get update -qq && apt-get  -y -q --no-install-recommends install docker-ce docker-ce-cli containerd.io
-RUN curl -sL https://deb.nodesource.com/setup_13.x | bash -s
-RUN apt install nodejs
 
 ARG GORELEASER_VERSION
+ARG NODE_VERSION
 ARG GORELEASER_DOWNLOAD_FILE=goreleaser_Linux_x86_64.tar.gz
 ARG GORELEASER_DOWNLOAD_URL=https://github.com/goreleaser/goreleaser/releases/download/v${GORELEASER_VERSION}/${GORELEASER_DOWNLOAD_FILE}
+
+# NodeJS
+RUN mkdir -p /usr/local/nvm
+ENV NVM_DIR /usr/local/nvm
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash \
+    && . $NVM_DIR/nvm.sh \
+    && nvm install ${NODE_VERSION} \
+    && nvm alias default ${NODE_VERSION} \
+    && nvm use default
+
+ENV NODE_PATH $NVM_DIR/v${NODE_VERSION}/lib/node_modules
+ENV PATH      $NVM_DIR/v${NODE_VERSION}/bin:$PATH
 
 # goreleaser
 RUN wget ${GORELEASER_DOWNLOAD_URL}; \
