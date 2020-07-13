@@ -151,6 +151,7 @@ RUN node --version
 RUN ory version
 RUN golangci-lint version
 
+COPY scripts /scripts
 COPY entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
