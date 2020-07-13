@@ -124,7 +124,7 @@ RUN go get github.com/sqs/goreturns github.com/ory/go-acc
 
 RUN mkdir -p cd $(go env GOPATH)/src/github.com/ory/cli; \
     cd $(go env GOPATH)/src/github.com/ory/cli; \
-    git clone git@github.com:ory/cli.git .; \
+    git clone https://github.com/ory/cli.git .; \
     go build -tags sqlite -o $(go env GOPATH)/bin/ory github.com/ory/cli
 
 RUN git config --global user.email "3372410+aeneasr@users.noreply.github.com"
