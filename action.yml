@@ -1,0 +1,63 @@
+name: ORY's CGO Cross Compiler and Releaser
+author: 'ORY'
+description: 'A GitHub action for cross-compiling (Linux, Windows, Mac) and releasing CGO applications using Goreleaser.'
+inputs:
+  run:
+    required: true
+    default: test
+    description: |
+      Command type to run:
+        - `check` runs `goreleaser check`.
+        - `release` creates the release.
+        - `test` checks if the release was successful.
+
+  # SDK start
+  swaggerSpecPath:
+    required: false
+    default: ".schema/api.swagger.json"
+    description: |
+      The filepath of the to be generated Swagger JSON Spec. This command is only
+      valid for:
+
+        - `run: sdk/release`
+        - `run: sdk/generate`
+  swaggerSdkDestination:
+    required: false
+    default: "internal/httpclient"
+    description: |
+      The path for the generated httpclient. This command is only
+      valid for:
+
+        - `run: sdk/release`
+        - `run: sdk/generate`
+  swaggerSpecIgnorePkgs:
+    required: false
+    default: "internal/httpclient"
+    description: |
+      Comma-separated list of packages (e.g. `internal/httpclient,gopkg.in/square/go-jose.v2`) to
+      be ignored when generating the Swagger JSON Spec.This command is only
+      valid for:
+
+        - `run: sdk/release`
+        - `run: sdk/generate`
+  # SDK end
+
+  dockerUser:
+    required: false
+    default: arekkas
+    description: The user used for `docker login`
+  dockerToken:
+    required: false
+    description: The token / password used for `docker login`
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.args.run }}
+  env:
+    SWAGGER_SPEC_PATH: ${{ inputs.args.swaggerSpecPath }}
+    SWAGGER_SPEC_IGNORE_PKGS: ${{ inputs.args.swaggerSpecIgnorePkgs }}
+    SWAGGER_SDK_DESTINATION: ${{ inputs.args.swaggerSdkDestination }}
+    DOCKER_USER: ${{ input.args.dockerUser }}
+    DOCKER_TOKEN: ${{ input.args.dockerToken }}
