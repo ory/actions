@@ -2,6 +2,6 @@
 
 set -Eeuox pipefail
 
-eval $(cli dev ci github env)
+eval $(ory dev ci github env)
 
 ./scripts/"$1".sh
