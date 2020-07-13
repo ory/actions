@@ -114,9 +114,6 @@ COPY --from=osx-cross "${OSX_CROSS_PATH}/." "${OSX_CROSS_PATH}/"
 COPY --from=libtool   "${OSX_CROSS_PATH}/." "${OSX_CROSS_PATH}/"
 ENV PATH=${OSX_CROSS_PATH}/target/bin:$PATH
 
-VOLUME /project
-WORKDIR /project
-
 RUN go version \
  && ory version \
  && golangci-lint version
