@@ -1,5 +1,4 @@
 ARG GO_VERSION=1.14.4
-ARG NODE_VERSION=14.5.0
 ARG GORELEASER_VERSION=0.139.0
 
 # OS-X SDK parameters
@@ -16,7 +15,6 @@ ARG LIBTOOL_VERSION=2.4.6
 ARG OSX_CODENAME=yosemite
 
 FROM golang:${GO_VERSION}-buster AS base
-ARG NODE_VERSION
 ARG APT_MIRROR
 RUN sed -ri "s/(httpredir|deb).debian.org/${APT_MIRROR:-deb.debian.org}/g" /etc/apt/sources.list \
  && sed -ri "s/(security).debian.org/${APT_MIRROR:-security.debian.org}/g" /etc/apt/sources.list
@@ -77,58 +75,31 @@ RUN apt-get update -qq && apt-get install -y -q --no-install-recommends \
     gettext \
     jq \
  && rm -rf /var/lib/apt/lists/*
-RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
-RUN add-apt-repository \
-       "deb [arch=amd64] https://download.docker.com/linux/debian \
-       $(lsb_release -cs) \
-       stable"
-RUN apt-get update -qq && apt-get  -y -q --no-install-recommends install docker-ce docker-ce-cli containerd.io
 
 ARG GORELEASER_VERSION
-ARG NODE_VERSION
 ARG GORELEASER_DOWNLOAD_FILE=goreleaser_Linux_x86_64.tar.gz
 ARG GORELEASER_DOWNLOAD_URL=https://github.com/goreleaser/goreleaser/releases/download/v${GORELEASER_VERSION}/${GORELEASER_DOWNLOAD_FILE}
-
-# NodeJS
-RUN mkdir -p /usr/local/nvm
-ENV NVM_DIR /usr/local/nvm
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash \
-    && . $NVM_DIR/nvm.sh \
-    && nvm install ${NODE_VERSION} \
-    && nvm alias default ${NODE_VERSION} \
-    && nvm use default
-
-ENV NODE_PATH $NVM_DIR/v${NODE_VERSION}/lib/node_modules
-ENV PATH      $NVM_DIR/v${NODE_VERSION}/bin:$PATH
-
-# goreleaser
-RUN wget ${GORELEASER_DOWNLOAD_URL}; \
-			tar -xzf $GORELEASER_DOWNLOAD_FILE -C /usr/bin/ goreleaser; \
-			rm $GORELEASER_DOWNLOAD_FILE;
-
-# go-swagger
-RUN download_url=$(curl -s https://api.github.com/repos/go-swagger/go-swagger/releases/latest \
-    | jq -r '.assets[] | select(.name | contains("'"$(uname | tr '[:upper:]' '[:lower:]')"'_amd64")) | .browser_download_url') \
-    && curl -o $GOPATH/bin/swagger -L'#' "$download_url" \
-    && chmod +x $GOPATH/bin/swagger
 
 # ORY CLI
 # Let's build from source instead...
 # RUN curl -sSfL https://raw.githubusercontent.com/ory/cli/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
 
-# golangci-lint
-RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.27.0
+RUN wget ${GORELEASER_DOWNLOAD_URL} \
+    && tar -xzf $GORELEASER_DOWNLOAD_FILE -C /usr/bin/ goreleaser \
+    && rm $GORELEASER_DOWNLOAD_FILE \
+    && download_url=$(curl -s https://api.github.com/repos/go-swagger/go-swagger/releases/latest | jq -r '.assets[] | select(.name | contains("'"$(uname | tr '[:upper:]' '[:lower:]')"'_amd64")) | .browser_download_url') \
+    && curl -o $GOPATH/bin/swagger -L'#' "$download_url" \
+    && chmod +x $GOPATH/bin/swagger
 
-# goreturns
-RUN go get github.com/sqs/goreturns github.com/ory/go-acc
+RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.27.0 \
+    && go get github.com/sqs/goreturns github.com/ory/go-acc \
+    && mkdir -p cd $(go env GOPATH)/src/github.com/ory/cli \
+    && cd $(go env GOPATH)/src/github.com/ory/cli \
+    && git clone https://github.com/ory/cli.git . \
+    && go build -tags sqlite -o $(go env GOPATH)/bin/ory github.com/ory/cli
 
-RUN mkdir -p cd $(go env GOPATH)/src/github.com/ory/cli; \
-    cd $(go env GOPATH)/src/github.com/ory/cli; \
-    git clone https://github.com/ory/cli.git .; \
-    go build -tags sqlite -o $(go env GOPATH)/bin/ory github.com/ory/cli
-
-RUN git config --global user.email "3372410+aeneasr@users.noreply.github.com"
-RUN git config --global user.name "aeneasr"
+RUN git config --global user.email "3372410+aeneasr@users.noreply.github.com" \
+    && git config --global user.name "aeneasr"
 
 RUN apt -y install apt-transport-https ca-certificates curl gnupg2 software-properties-common \
     && curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - \
@@ -146,10 +117,9 @@ ENV PATH=${OSX_CROSS_PATH}/target/bin:$PATH
 VOLUME /project
 WORKDIR /project
 
-RUN go version
-RUN node --version
-RUN ory version
-RUN golangci-lint version
+RUN go version \
+ && ory version \
+ && golangci-lint version
 
 COPY scripts /scripts
 COPY entrypoint.sh /entrypoint.sh
