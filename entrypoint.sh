@@ -2,10 +2,12 @@
 
 set -Eeuox pipefail
 
+args=$*
+
 function dump() {
   echo "Failed running script."
   echo ""
-  echo "  args:     $1"
+  echo "  args:     ${args}"
   echo "  pwd:      $(pwd)"
   echo "  contents:"
   ls -lah
