@@ -146,6 +146,11 @@ ENV PATH=${OSX_CROSS_PATH}/target/bin:$PATH
 VOLUME /project
 WORKDIR /project
 
+RUN go version
+RUN node --version
+RUN ory version
+RUN golangci-lint version
+
 COPY entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
