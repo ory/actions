@@ -80,9 +80,9 @@ ARG GORELEASER_VERSION
 ARG GORELEASER_DOWNLOAD_FILE=goreleaser_Linux_x86_64.tar.gz
 ARG GORELEASER_DOWNLOAD_URL=https://github.com/goreleaser/goreleaser/releases/download/v${GORELEASER_VERSION}/${GORELEASER_DOWNLOAD_FILE}
 
-# ORY CLI
-# Let's build from source instead...
-# RUN curl -sSfL https://raw.githubusercontent.com/ory/cli/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
+# ORY CLI - Let's build from source instead...
+#
+#   RUN curl -sSfL https://raw.githubusercontent.com/ory/cli/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
 
 RUN wget ${GORELEASER_DOWNLOAD_URL} \
     && tar -xzf $GORELEASER_DOWNLOAD_FILE -C /usr/bin/ goreleaser \
