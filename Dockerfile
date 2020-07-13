@@ -122,9 +122,12 @@ RUN download_url=$(curl -s https://api.github.com/repos/go-swagger/go-swagger/re
 RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.27.0
 
 # goreturns
-RUN go get github.com/sqs/goreturns github.com/ory/go-acc github.com/ory/cli
+RUN go get github.com/sqs/goreturns github.com/ory/go-acc
 
-RUN cd $(go env GOPATH)/src/github.com/ory/cli; go build -tags sqlite -o $(go env GOPATH)/bin/ory github.com/ory/cli
+RUN mkdir -p cd $(go env GOPATH)/src/github.com/ory/cli; \
+    cd $(go env GOPATH)/src/github.com/ory/cli; \
+    git clone git@github.com:ory/cli.git .; \
+    go build -tags sqlite -o $(go env GOPATH)/bin/ory github.com/ory/cli
 
 RUN git config --global user.email "3372410+aeneasr@users.noreply.github.com"
 RUN git config --global user.name "aeneasr"
