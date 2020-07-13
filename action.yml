@@ -1,6 +1,6 @@
-name: ORY's CGO Cross Compiler and Releaser
+name: ORY's global GitHub Actions
 author: 'ORY'
-description: 'A GitHub action for cross-compiling (Linux, Windows, Mac) and releasing CGO applications using Goreleaser.'
+description: 'GitHub actions for regular ORY CI tasks.'
 inputs:
   run:
     required: true
