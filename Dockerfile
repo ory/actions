@@ -88,8 +88,8 @@ RUN wget ${GORELEASER_DOWNLOAD_URL} \
     && tar -xzf $GORELEASER_DOWNLOAD_FILE -C /usr/bin/ goreleaser \
     && rm $GORELEASER_DOWNLOAD_FILE \
     && download_url=$(curl -s https://api.github.com/repos/go-swagger/go-swagger/releases/latest | jq -r '.assets[] | select(.name | contains("'"$(uname | tr '[:upper:]' '[:lower:]')"'_amd64")) | .browser_download_url') \
-    && curl -o $GOPATH/bin/swagger -L'#' "$download_url" \
-    && chmod +x $GOPATH/bin/swagger
+    && curl -o $(go env GOPATH)/bin/swagger -L'#' "$download_url" \
+    && chmod +x $(go env GOPATH)/bin/swagger
 
 RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.27.0 \
     && go get github.com/sqs/goreturns github.com/ory/go-acc \
